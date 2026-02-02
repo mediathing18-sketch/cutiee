@@ -66,13 +66,6 @@
       100% { transform: translateY(0); }
     }
 
-    .art {
-      width: min(260px, 80vw);
-      margin: 0 auto 10px;
-      display: block;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,.12));
-    }
-
     h1 {
       font-size: clamp(26px, 4vw, 44px);
       margin: 12px 0 18px;
@@ -124,10 +117,6 @@
         0 12px 24px rgba(0,0,0,.2);
     }
 
-    #yesBtn:hover {
-      background: linear-gradient(135deg, #ff1f68, #ff4d88);
-    }
-
     #noBtn {
       left: 62%;
       background: #e5e7eb;
@@ -155,60 +144,29 @@
         0 0 20px rgba(255, 59, 122, .4);
     }
 
-    .fireworks {
-      width: min(380px, 90vw);
-      margin: 0 auto;
-      display: block;
-    }
-
     @keyframes pop {
       from { transform: scale(.96); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
 
-    body::before, body::after {
-      content: "💖 💕 💗 💓 💞";
-      position: fixed;
-      width: 100%;
-      text-align: center;
-      font-size: 32px;
-      opacity: .15;
-      animation: heartsFloat 12s linear infinite;
-      pointer-events: none;
+    /* FAST SHAKE ANIMATION */
+    @keyframes shakeFast {
+      0%   { transform: translate(-50%, -50%) translateX(0); }
+      20%  { transform: translate(-50%, -50%) translateX(-6px); }
+      40%  { transform: translate(-50%, -50%) translateX(6px); }
+      60%  { transform: translate(-50%, -50%) translateX(-6px); }
+      80%  { transform: translate(-50%, -50%) translateX(6px); }
+      100% { transform: translate(-50%, -50%) translateX(0); }
     }
 
-    body::after {
-      animation-delay: 6s;
-      top: 100%;
-    }
-
-    @keyframes heartsFloat {
-      from { transform: translateY(100%); }
-      to { transform: translateY(-120%); }
-    }
-
-    /* HEART BURST */
-    .heart {
-      position: fixed;
-      font-size: 22px;
-      pointer-events: none;
-      animation: heartPop 0.9s ease forwards;
-    }
-
-    @keyframes heartPop {
-      from {
-        transform: scale(0) translateY(0);
-        opacity: 1;
-      }
-      to {
-        transform: scale(1.5) translateY(-40px);
-        opacity: 0;
-      }
+    .shake {
+      animation: shakeFast 0.15s infinite;
     }
   </style>
 </head>
 
 <body>
+
   <audio id="bgMusic" autoplay loop>
     <source src="music.mp3" type="audio/mpeg">
   </audio>
@@ -216,42 +174,6 @@
   <canvas id="confettiCanvas"></canvas>
 
   <main class="card">
-    <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="fur" x1="0" x2="1">
-          <stop offset="0" stop-color="#f7c7a1"/>
-          <stop offset="1" stop-color="#f2a97b"/>
-        </linearGradient>
-        <linearGradient id="heart" x1="0" x2="1">
-          <stop offset="0" stop-color="#ff4d7d"/>
-          <stop offset="1" stop-color="#ff1f68"/>
-        </linearGradient>
-      </defs>
-
-      <path d="M250 50 C250 33 270 25 282 38
-               C294 25 314 33 314 50
-               C314 78 282 92 282 106
-               C282 92 250 78 250 50Z"
-            fill="url(#heart)"/>
-
-      <path d="M90 120 C90 70 140 40 190 60
-               C240 40 290 70 290 120
-               C290 180 240 210 190 210
-               C140 210 90 180 90 120Z"
-            fill="url(#fur)"/>
-
-      <path d="M110 92 L95 55 L140 78 Z" fill="#f2a97b"/>
-      <path d="M270 92 L285 55 L240 78 Z" fill="#f2a97b"/>
-
-      <circle cx="160" cy="130" r="8"/>
-      <circle cx="220" cy="130" r="8"/>
-
-      <path d="M190 144 C186 144 182 148 182 152
-               C182 160 190 164 190 170
-               C190 164 198 160 198 152
-               C198 148 194 144 190 144Z"
-            fill="#ff7aa2"/>
-    </svg>
 
     <h1>Do you love me Cutie?</h1>
 
@@ -300,7 +222,6 @@
 
     resizeConfettiCanvas();
     window.addEventListener("resize", resizeConfettiCanvas);
-    window.addEventListener("orientationchange", () => setTimeout(resizeConfettiCanvas, 150));
 
     const confettiInstance = confetti.create(confettiCanvas, {
       resize: false,
@@ -349,19 +270,21 @@
 
       noBtn.style.left = newLeft + "px";
       noBtn.style.top = newTop + "px";
-      noBtn.style.transform = "translateY(-50%)";
     }
 
     function escapeNo(e) {
       e.preventDefault();
       e.stopPropagation();
 
+      // Start shaking
+      noBtn.classList.add("shake");
+
       if (!moving) {
         moving = true;
         moveInterval = setInterval(() => {
           moveNoButton();
           growYes();
-        }, 450);
+        }, 300); // fast movement
       }
     }
 
@@ -379,6 +302,6 @@
       fullScreenConfetti();
     });
   </script>
+
 </body>
 </html>
-
