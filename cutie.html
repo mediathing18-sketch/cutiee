@@ -103,7 +103,7 @@
         inset 0 -4px 0 rgba(0,0,0,.15);
       user-select: none;
       -webkit-tap-highlight-color: transparent;
-      transition: left 0.05s linear, top 0.05s linear;
+      transition: left 0.2s linear, top 0.2s linear, transform 0.1s ease;
     }
 
     button:hover {
@@ -187,25 +187,6 @@
       to { transform: translateY(-120%); }
     }
 
-    /* VIOLENT SHAKE */
-    @keyframes violentShake {
-      0%   { transform: translateY(-50%) rotate(0deg); }
-      10%  { transform: translateY(-52%) rotate(-10deg); }
-      20%  { transform: translateY(-48%) rotate(10deg); }
-      30%  { transform: translateY(-54%) rotate(-14deg); }
-      40%  { transform: translateY(-46%) rotate(14deg); }
-      50%  { transform: translateY(-52%) rotate(-10deg); }
-      60%  { transform: translateY(-48%) rotate(10deg); }
-      70%  { transform: translateY(-54%) rotate(-14deg); }
-      80%  { transform: translateY(-46%) rotate(14deg); }
-      90%  { transform: translateY(-52%) rotate(-10deg); }
-      100% { transform: translateY(-50%) rotate(0deg); }
-    }
-
-    #noBtn.shake {
-      animation: violentShake 0.15s infinite;
-    }
-
     /* HEART BURST */
     .heart {
       position: fixed;
@@ -282,7 +263,7 @@
     <div class="hint" id="hint">“No” seems a bit shy 😈</div>
 
     <section class="result" id="result">
-      <h2>ummah..😘🥰i know u ...😚😚😚😚😚</h2>
+      <h2>ummah..😘🥰 i know u ... 😚😚😚😚😚</h2>
       <img
         class="fireworks"
         src="https://gifdb.com/images/high/escape-door-tom-and-jerry-aldsr38ifhlq4zx9.webp"
@@ -352,27 +333,14 @@
 
     let yesScale = 1;
     function growYes() {
-      yesScale = Math.min(1.5, yesScale + 0.1);
+      yesScale = Math.min(1.6, yesScale + 0.05);
       yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
     }
 
-    function escapeNo(e) {
-      e.preventDefault();
-      e.stopPropagation();
+    let moving = false;
+    let moveInterval = null;
 
-      // SHAKE
-      noBtn.classList.add("shake");
-
-      // TEMP TEXT
-      const originalText = noBtn.textContent;
-      noBtn.textContent = "NOPE 😜";
-
-      setTimeout(() => {
-        noBtn.textContent = originalText;
-        noBtn.classList.remove("shake");
-      }, 500);
-
-      // TELEPORT
+    function moveNoButton() {
       const z = zone.getBoundingClientRect();
       const b = noBtn.getBoundingClientRect();
 
@@ -382,24 +350,19 @@
       noBtn.style.left = newLeft + "px";
       noBtn.style.top = newTop + "px";
       noBtn.style.transform = "translateY(-50%)";
+    }
 
-      // HEART BURST
-      for (let i = 0; i < 6; i++) {
-        const heart = document.createElement("div");
-        heart.className = "heart";
-        heart.textContent = "💖";
+    function escapeNo(e) {
+      e.preventDefault();
+      e.stopPropagation();
 
-        const x = b.left + Math.random() * b.width;
-        const y = b.top + Math.random() * b.height;
-
-        heart.style.left = x + "px";
-        heart.style.top = y + "px";
-
-        document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 900);
+      if (!moving) {
+        moving = true;
+        moveInterval = setInterval(() => {
+          moveNoButton();
+          growYes();
+        }, 450);
       }
-
-      growYes();
     }
 
     ["mouseenter", "mouseover", "pointerover", "mousedown", "pointerdown", "touchstart", "click"]
@@ -408,6 +371,7 @@
       });
 
     yesBtn.addEventListener("click", () => {
+      if (moveInterval) clearInterval(moveInterval);
       zone.style.display = "none";
       hint.style.display = "none";
       result.style.display = "block";
@@ -417,3 +381,4 @@
   </script>
 </body>
 </html>
+
